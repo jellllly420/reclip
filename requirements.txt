@@ -1,5 +1,5 @@
 attrs==21.2.0
-blis==0.7.4
+blis==0.7.8
 catalogue==2.0.6
 certifi==2021.5.30
 chardet==4.0.0
