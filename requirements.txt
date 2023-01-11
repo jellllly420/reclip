@@ -6,7 +6,7 @@ chardet==4.0.0
 click==7.1.2
 clip @ git+https://github.com/openai/CLIP.git
 cymem==2.0.5
-en-core-web-sm @ https://github.com/explosion/spacy-models/releases/download/hr_core_news_sm-3.4.0/hr_core_news_sm-3.4.0-py3-none-any.whl
+en-core-web-sm @ https://github.com/explosion/spacy-models/releases/download/en_core_web_sm-3.4.1/en_core_web_sm-3.4.1-py3-none-any.whl
 filelock==3.0.12
 ftfy==6.0.3
 huggingface-hub==0.0.12
