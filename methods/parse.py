@@ -165,7 +165,7 @@ class Parse(RefMethod):
 
         # Only use superlatives if thresholds work out.
         m1, m2 = probs[(-probs).argsort()[:2]]
-        if m1 < self.baseline_threshold * m2:
+        if m1 < float("inf") * m2:
             self.counts["n_rec_sup"] += 1
             for tokens in ent.superlatives:
                 self.counts["n_sup"] += 1
