@@ -98,71 +98,73 @@ class Parse(RefMethod):
                       ) -> np.ndarray:
         """Execute an `Entity` tree recursively, yielding a distribution over boxes."""
         self.counts["n_rec"] += 1
-        raw_probs = [1 for _ in range(len(env.boxes))]
+        text = ent.text
+        raw_probs = self._filter(text, env, root=root)
+        # raw_probs = [1 for _ in range(len(env.boxes))]
         head_probs = raw_probs
 
         # Only use relations if the head baseline isn't certain.
-        if len(probs) == 1 or len(env.boxes) == 1:
-            return probs, [ent.text]
+        if len(raw_probs) == 1 or len(env.boxes) == 1:
+            return raw_probs, [ent.text]
 
-        m1, m2 = probs[:2] # probs[(-probs).argsort()[:2]]
-        text = ent.text
+        # m1, m2 = raw_probs[:2] # probs[(-probs).argsort()[:2]]
         rel_probs = []
-        if self.baseline_threshold == float("inf") or m1 < self.baseline_threshold * m2:
-            self.counts["n_rec_rel"] += 1
-            for tokens, ent2 in ent.relations:
-                self.counts["n_rel"] += 1
-                rel = None
-                # Heuristically decide which spatial relation is represented.
-                for heuristic in self.heuristics.relations:
-                    if any(tok.text in heuristic.keywords for tok in tokens):
-                        rel = heuristic.callback(env)
-                        self.counts[f"n_rel_{heuristic.keywords[0]}"] += 1
-                        break
-                # Filter and normalize by the spatial relation.
-                if rel is not None:
-                    probs2 = self.execute_entity(ent2, env, chunks, root=False)
-                    events = L.meet(np.expand_dims(probs2, axis=0), rel)
-                    new_probs = L.join_reduce(events)
-                    rel_probs.append((ent2.text, new_probs, probs2))
-                    continue
+        self.counts["n_rec_rel"] += 1
+        for tokens, ent2 in ent.relations:
+            self.counts["n_rel"] += 1
+            rel = None
+            # Heuristically decide which spatial relation is represented.
+            for heuristic in self.heuristics.relations:
+                if any(tok.text in heuristic.keywords for tok in tokens):
+                    rel = heuristic.callback(env)
+                    self.counts[f"n_rel_{heuristic.keywords[0]}"] += 1
+                    break
+            # Filter and normalize by the spatial relation.
+            if rel is not None:
+                probs2 = self.execute_entity(ent2, env, chunks, root=False)
+                events = L.meet(np.expand_dims(probs2, axis=0), rel)
+                new_probs = L.join_reduce(events)
+                rel_probs.append((ent2.text, new_probs, probs2))
+                continue
 
-                # This case specifically handles "between", which takes two noun arguments.
-                rel = None
-                for heuristic in self.heuristics.ternary_relations:
-                    if any(tok.text in heuristic.keywords for tok in tokens):
-                        rel = heuristic.callback(env)
-                        self.counts[f"n_rel_{heuristic.keywords[0]}"] += 1
-                        break
-                if rel is not None:
-                    ent3 = get_conjunct(ent2, chunks, self.heuristics)
-                    if ent3 is not None:
-                        probs2 = self.execute_entity(ent2, env, chunks, root=False)
-                        probs2 = np.expand_dims(probs2, axis=[0, 2])
-                        probs3 = self.execute_entity(ent3, env, chunks, root=False)
-                        probs3 = np.expand_dims(probs3, axis=[0, 1])
-                        events = L.meet(L.meet(probs2, probs3), rel)
-                        new_probs = L.join_reduce(L.join_reduce(events))
-                        probs = L.meet(probs, new_probs)
-                    continue
-                # Otherwise, treat the relation as a possessive relation.
-                if not self.args.no_possessive:
-                    if self.possessive_expand:
-                        text = ent.expand(ent2.head)
-                    else:
-                        text += f' {" ".join(tok.text for tok in tokens)} {ent2.text}'
-                    poss_probs = self._filter(text, env, root=root, expand=.3)
-            raw_probs = self._filter(text, env, root=root)
-            texts = [text]
-            return_probs = [(probs.tolist(), probs.tolist())]
-            for (ent2_text, new_probs, ent2_only_probs) in rel_probs:
-                probs = L.meet(raw_probs, new_probs)
-                probs /= probs.sum()
-                texts.append(ent2_text)
-                return_probs.append((probs.tolist(), ent2_only_probs.tolist()))
+            # This case specifically handles "between", which takes two noun arguments.
+            rel = None
+            for heuristic in self.heuristics.ternary_relations:
+                if any(tok.text in heuristic.keywords for tok in tokens):
+                    rel = heuristic.callback(env)
+                    self.counts[f"n_rel_{heuristic.keywords[0]}"] += 1
+                    break
+            if rel is not None:
+                ent3 = get_conjunct(ent2, chunks, self.heuristics)
+                if ent3 is not None:
+                    probs2 = self.execute_entity(ent2, env, chunks, root=False)
+                    probs2 = np.expand_dims(probs2, axis=[0, 2])
+                    probs3 = self.execute_entity(ent3, env, chunks, root=False)
+                    probs3 = np.expand_dims(probs3, axis=[0, 1])
+                    temp_probs = L.meet(probs2, probs3)
+                    events = L.meet(temp_probs, rel)
+                    new_probs = L.join_reduce(L.join_reduce(events))
+                    # probs = L.meet(probs, new_probs)
+                    rel_probs.append((ent2.text+ent3.text, new_probs, temp_probs))
+                continue
+            # Otherwise, treat the relation as a possessive relation.
+            if not self.args.no_possessive:
+                if self.possessive_expand:
+                    text = ent.expand(ent2.head)
+                else:
+                    text += f' {" ".join(tok.text for tok in tokens)} {ent2.text}'
+                poss_probs = self._filter(text, env, root=root, expand=.3)
+        probs = raw_probs
+        texts = [text]
+        return_probs = [(probs.tolist(), probs.tolist())]
+        for (ent2_text, new_probs, ent2_only_probs) in rel_probs:
+            probs = L.meet(probs, new_probs)
+            probs /= probs.sum()
+            texts.append(ent2_text)
+            return_probs.append((probs.tolist(), ent2_only_probs.tolist()))
 
         # Only use superlatives if thresholds work out.
-        m1, m2 = raw_probs[(-raw_probs).argsort()[:2]]
+        m1, m2 = probs[(-probs).argsort()[:2]]
         if m1 < self.baseline_threshold * m2:
             self.counts["n_rec_sup"] += 1
             for tokens in ent.superlatives:
