@@ -165,7 +165,7 @@ class Parse(RefMethod):
 
         # Only use superlatives if thresholds work out.
         m1, m2 = probs[(-probs).argsort()[:2]]
-        if m1 < float("inf") * m2:
+        if m1 < self.baseline_threshold * m2:
             self.counts["n_rec_sup"] += 1
             for tokens in ent.superlatives:
                 self.counts["n_sup"] += 1
@@ -178,7 +178,7 @@ class Parse(RefMethod):
                         break
                 if sup is not None:
                     # Could use `probs` or `head_probs` here?
-                    precond = head_probs if self.superlative_head_only else probs
+                    precond = head_probs if self.superlative_head_only else raw_probs
                     probs = L.meet(np.expand_dims(precond, axis=1)*np.expand_dims(precond, axis=0), sup).sum(axis=1)
                     probs = probs / probs.sum()
                     return_probs.append((probs.tolist(), None))
