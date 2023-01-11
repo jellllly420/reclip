@@ -81,6 +81,8 @@ class Entity(NamedTuple):
 
     @classmethod
     def _get_rel_sups(cls, token, head, tokens, chunks, heuristics) -> Tuple[List[Rel], List[Sup]]:
+        print(token)
+        print(tokens)
         hchunk = chunks[head.i]
         is_keyword = any(token.text in h.keywords for h in heuristics.relations)
         is_keyword |= token.text in heuristics.null_keywords
