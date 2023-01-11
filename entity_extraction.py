@@ -58,14 +58,14 @@ class Entity(NamedTuple):
         sup = []
         if head.i not in chunks:
             # Handles predicative cases.
+            # TODO: Also extract predicative relations.
             # catches "man bottom left"
             children = list(head.children)
             if children:
                 sup.extend(find_superlatives([doc[head.i].text], heuristics))
                 for child in children:
                     if child.i in chunks:
-                    head = child
-                # TODO: Also extract predicative relations.
+                        head = child
             else:
                 return None
         hchunk = chunks[head.i]                                            # a man to the left of a woman
