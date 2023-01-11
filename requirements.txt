@@ -39,7 +39,7 @@ smart-open==5.1.0
 spacy==3.4.0
 spacy-legacy==3.0.9
 srsly==2.4.1
-thinc==8.0.7
+thinc==8.1.0
 timm==0.4.12
 tokenizers==0.10.3
 toml==0.10.2
