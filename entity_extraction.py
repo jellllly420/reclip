@@ -81,6 +81,7 @@ class Entity(NamedTuple):
 
     @classmethod
     def _get_rel_sups(cls, token, head, tokens, chunks, heuristics) -> Tuple[List[Rel], List[Sup]]:
+        print("debug info:")
         print(token)
         for child in token.children:
             print(child)
