@@ -166,6 +166,7 @@ class Parse(RefMethod):
         if m1 < self.baseline_threshold * m2:
             self.counts["n_rec_sup"] += 1
             for tokens in ent.superlatives:
+                print(probs)
                 self.counts["n_sup"] += 1
                 sup = None
                 for heuristic_index, heuristic in enumerate(self.heuristics.superlatives):
