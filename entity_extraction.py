@@ -62,7 +62,7 @@ class Entity(NamedTuple):
             # catches "man bottom left"
             children = list(head.children)
             if children:
-                sup.extend(find_superlatives([head.text], heuristics))
+                sup.extend(find_superlatives([head], heuristics))
                 for child in children:
                     if child.i in chunks:
                         head = child
