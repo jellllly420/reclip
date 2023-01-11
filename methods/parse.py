@@ -98,7 +98,7 @@ class Parse(RefMethod):
                       ) -> np.ndarray:
         """Execute an `Entity` tree recursively, yielding a distribution over boxes."""
         self.counts["n_rec"] += 1
-        probs = [1, 1]
+        raw_probs = [1 for _ in range(len(env.boxes))]
         head_probs = probs
 
         # Only use relations if the head baseline isn't certain.
@@ -152,17 +152,17 @@ class Parse(RefMethod):
                     else:
                         text += f' {" ".join(tok.text for tok in tokens)} {ent2.text}'
                     poss_probs = self._filter(text, env, root=root, expand=.3)
-            probs = self._filter(text, env, root=root)
+            raw_probs = self._filter(text, env, root=root)
             texts = [text]
             return_probs = [(probs.tolist(), probs.tolist())]
             for (ent2_text, new_probs, ent2_only_probs) in rel_probs:
-                probs = L.meet(probs, new_probs)
+                probs = L.meet(raw_probs, new_probs)
                 probs /= probs.sum()
                 texts.append(ent2_text)
                 return_probs.append((probs.tolist(), ent2_only_probs.tolist()))
 
         # Only use superlatives if thresholds work out.
-        m1, m2 = probs[(-probs).argsort()[:2]]
+        m1, m2 = raw_probs[(-raw_probs).argsort()[:2]]
         if m1 < self.baseline_threshold * m2:
             self.counts["n_rec_sup"] += 1
             for tokens in ent.superlatives:
@@ -176,7 +176,7 @@ class Parse(RefMethod):
                         break
                 if sup is not None:
                     # Could use `probs` or `head_probs` here?
-                    precond = head_probs if self.superlative_head_only else probs
+                    precond = head_probs if self.superlative_head_only else raw_probs
                     probs = L.meet(np.expand_dims(precond, axis=1)*np.expand_dims(precond, axis=0), sup).sum(axis=1)
                     probs = probs / probs.sum()
                     return_probs.append((probs.tolist(), None))

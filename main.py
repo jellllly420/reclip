@@ -54,7 +54,7 @@ if __name__ == "__main__":
     parser.add_argument("--no_sup", action="store_true", help="Disable superlative extraction.")
     parser.add_argument("--no_null", action="store_true", help="Disable null keyword heuristics.")
     parser.add_argument("--ternary", action="store_true", help="Disable ternary relation extraction.")
-    parser.add_argument("--baseline_threshold", type=float, default=float("inf"), help="(Parse) Threshold to use relations/superlatives.")
+    parser.add_argument("--baseline_threshold", type=float, default=5., help="(Parse) Threshold to use relations/superlatives.")
     parser.add_argument("--temperature", type=float, default=1., help="(Parse) Sigmoid temperature.")
     parser.add_argument("--superlative_head_only", action="store_true", help="(Parse) Superlatives only quanntify head predicate.")
     parser.add_argument("--sigmoid", action="store_true", help="(Parse) Use sigmoid, not softmax.")
