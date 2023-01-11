@@ -178,7 +178,7 @@ class Parse(RefMethod):
                         break
                 if sup is not None:
                     # Could use `probs` or `head_probs` here?
-                    precond = head_probs if self.superlative_head_only else raw_probs
+                    precond = head_probs if self.superlative_head_only else probs
                     probs = L.meet(np.expand_dims(precond, axis=1)*np.expand_dims(precond, axis=0), sup).sum(axis=1)
                     probs = probs / probs.sum()
                     return_probs.append((probs.tolist(), None))
