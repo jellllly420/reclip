@@ -36,7 +36,7 @@ sacremoses==0.0.45
 scipy==1.7.0
 six==1.16.0
 smart-open==5.1.0
-spacy==3.0.6
+spacy==3.4.0
 spacy-legacy==3.0.7
 srsly==2.4.1
 thinc==8.0.7
