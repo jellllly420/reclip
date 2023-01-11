@@ -38,7 +38,7 @@ six==1.16.0
 smart-open==5.1.0
 spacy==3.4.0
 spacy-legacy==3.0.9
-srsly==2.4.1
+srsly==2.4.3
 thinc==8.1.0
 timm==0.4.12
 tokenizers==0.10.3
