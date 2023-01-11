@@ -55,16 +55,22 @@ class Entity(NamedTuple):
         if heuristics is None:
             heuristics = DEFAULT_HEURISTICS
 
+        sup = []
         if head.i not in chunks:
             # Handles predicative cases.
+            # catches "man bottom left"
             children = list(head.children)
-            if children and children[0].i in chunks:
-                head = children[0]
+            if children:
+                sup.extend(find_superlatives([doc[head.i].text], heuristics))
+                for child in children:
+                    if child.i in chunks:
+                    head = child
                 # TODO: Also extract predicative relations.
             else:
                 return None
-        hchunk = chunks[head.i]
-        rels, sups = cls._get_rel_sups(head, head, [], chunks, heuristics)
+        hchunk = chunks[head.i]                                            # a man to the left of a woman
+        rels, sups = cls._get_rel_sups(head, head, [], chunks, heuristics) # man, man, [], {0,1: a man, 3,4: the left, 6,7: a woman}
+        sups.extend(sup)
         return cls(hchunk, rels, sups)
 
     @classmethod
@@ -73,8 +79,8 @@ class Entity(NamedTuple):
         is_keyword = any(token.text in h.keywords for h in heuristics.relations)
         is_keyword |= token.text in heuristics.null_keywords
 
-        # Found another entity head.
-        if token.i in chunks and chunks[token.i] is not hchunk and not is_keyword:
+        # Found another entity head.  
+        if token.i in chunks and chunks[token.i] is not hchunk and not is_keyword: # enter a new noun chunk (not relations)
             tchunk = chunks[token.i]
             tokens.sort(key=lambda tok: tok.i)
             subhead = cls.extract(token, chunks, heuristics)
@@ -89,13 +95,14 @@ class Entity(NamedTuple):
         superlatives = []
         is_keyword |= any(token.text in h.keywords for h in heuristics.superlatives)
         for child in token.children:
-            if token.i in chunks and child.i in chunks and chunks[token.i] is chunks[child.i]:
+            """
+            if token.i not in chunks and child.i not in chunks:
                 if not any(child.text in h.keywords for h in heuristics.superlatives):
                     if n_children == 1:
                         # Catches "the goat on the left"
                         sups = find_superlatives(tokens + [token], heuristics)
                         superlatives.extend(sups)
-                    continue
+            """
             new_tokens = tokens + [token] if token.i not in chunks or is_keyword else tokens
             subrel, subsup = cls._get_rel_sups(child, head, new_tokens, chunks, heuristics)
             relations.extend(subrel)
