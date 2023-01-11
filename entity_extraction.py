@@ -63,8 +63,8 @@ class Entity(NamedTuple):
                 # TODO: Also extract predicative relations.
             else:
                 return None
-        hchunk = chunks[head.i]
-        rels, sups = cls._get_rel_sups(head, head, [], chunks, heuristics)
+        hchunk = chunks[head.i]                                            # a man to the left of a woman
+        rels, sups = cls._get_rel_sups(head, head, [], chunks, heuristics) # man, man, [], {0,1: a man, 3,4: the left, 6,7: a woman}
         return cls(hchunk, rels, sups)
 
     @classmethod
@@ -73,8 +73,8 @@ class Entity(NamedTuple):
         is_keyword = any(token.text in h.keywords for h in heuristics.relations)
         is_keyword |= token.text in heuristics.null_keywords
 
-        # Found another entity head.
-        if token.i in chunks and chunks[token.i] is not hchunk and not is_keyword:
+        # Found another entity head.  
+        if token.i in chunks and chunks[token.i] is not hchunk and not is_keyword: # enter a new noun chunk (not relations)
             tchunk = chunks[token.i]
             tokens.sort(key=lambda tok: tok.i)
             subhead = cls.extract(token, chunks, heuristics)
@@ -97,7 +97,9 @@ class Entity(NamedTuple):
                         superlatives.extend(sups)
                     continue
             new_tokens = tokens + [token] if token.i not in chunks or is_keyword else tokens
-            subrel, subsup = cls._get_rel_sups(child, head, new_tokens, chunks, heuristics)
+            subrel, subsup = cls._get_rel_sups(child, head, new_tokens, chunks, heuristics) # to, man, [], {} 
+                                                                                            # left, man, [to], {}
+                                                                                            # 
             relations.extend(subrel)
             superlatives.extend(subsup)
         return relations, superlatives
