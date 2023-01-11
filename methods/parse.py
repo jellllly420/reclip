@@ -57,7 +57,7 @@ class Parse(RefMethod):
     def execute(self, caption: str, env: "Environment") -> Dict[str, Any]:
         """Construct an `Entity` tree from the parse and execute it to yield a distribution over boxes."""
         # Start by using the full caption, as in Baseline.
-        # probs = env.filter(caption, area_threshold=self.box_area_threshold, softmax=True)
+        probs = env.filter(caption, area_threshold=self.box_area_threshold, softmax=True)
 
         # Extend the baseline using parse stuff.
         doc = self.nlp(caption)
@@ -75,16 +75,16 @@ class Parse(RefMethod):
 
         # If we have found some head noun, filter based on it.
         if entity is not None and (any(any(token.text in h.keywords for h in self.heuristics.relations+self.heuristics.superlatives) for token in doc) or not self.branch):
-            ent_probs, texts = self.execute_entity(entity, env, chunks)
+            probs, texts = self.execute_entity(entity, env, chunks)
             # probs = L.meet(probs, ent_probs)
         else:
             texts = [caption]
             self.counts["n_full_expr"] += 1
 
         self.counts["n_total"] += 1
-        pred = np.argmax(ent_probs)
+        pred = np.argmax(probs)
         return {
-            "probs": ent_probs,
+            "probs": probs,
             "pred": pred,
             "box": env.boxes[pred],
             "texts": texts
