@@ -99,7 +99,7 @@ class Parse(RefMethod):
         """Execute an `Entity` tree recursively, yielding a distribution over boxes."""
         self.counts["n_rec"] += 1
         raw_probs = [1 for _ in range(len(env.boxes))]
-        head_probs = probs
+        head_probs = raw_probs
 
         # Only use relations if the head baseline isn't certain.
         if len(probs) == 1 or len(env.boxes) == 1:
