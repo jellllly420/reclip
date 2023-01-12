@@ -131,7 +131,7 @@ class Parse(RefMethod):
                 # Specifically handles "with", which connects two noun chunks like "noun.1 with noun.2"
                 rel = None
                 if any(tok.text == "with" for tok in tokens):
-                    text += ent2.text
+                    text += ("with" + ent2.text)
                     continue
 
                 # This case specifically handles "between", which takes two noun arguments.
