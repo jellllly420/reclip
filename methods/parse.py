@@ -83,7 +83,7 @@ class Parse(RefMethod):
 
         self.counts["n_total"] += 1
         pred = np.argmax(probs)
-        print(pred)
+        # print(pred)
         return {
             "probs": probs,
             "pred": pred,
@@ -167,7 +167,7 @@ class Parse(RefMethod):
         if m1 < self.baseline_threshold * m2:
             self.counts["n_rec_sup"] += 1
             for tokens in ent.superlatives:
-                print(probs)
+                # print(probs)
                 self.counts["n_sup"] += 1
                 sup = None
                 for heuristic_index, heuristic in enumerate(self.heuristics.superlatives):
@@ -228,7 +228,7 @@ class Parse(RefMethod):
                ) -> np.ndarray:
         """Wrap a filter call in a consistent way for all recursions."""
         kwargs = {
-            "softmax": True,
+            "softmax": not self.args.sigmoid,
             "temperature": self.args.temperature,
         }
         if root:
