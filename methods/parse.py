@@ -83,6 +83,7 @@ class Parse(RefMethod):
 
         self.counts["n_total"] += 1
         pred = np.argmax(probs)
+        print(pred)
         return {
             "probs": probs,
             "pred": pred,
@@ -227,7 +228,7 @@ class Parse(RefMethod):
                ) -> np.ndarray:
         """Wrap a filter call in a consistent way for all recursions."""
         kwargs = {
-            "softmax": not self.args.sigmoid,
+            "softmax": True,
             "temperature": self.args.temperature,
         }
         if root:
