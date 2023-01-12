@@ -31,7 +31,7 @@ class Heuristics:
         RelHeuristic(["left", "west", "leftmost", "western"], lambda env: env.left_of()),
         RelHeuristic(["right", "rightmost", "east", "eastern"], lambda env: env.right_of()),
         RelHeuristic(["above", "north", "top"], lambda env: env.above()),
-        RelHeuristic(["below", "south", "underneath", "front"], lambda env: env.below()),
+        RelHeuristic(["below", "south", "underneath", "front", "foreground"], lambda env: env.below()),
         RelHeuristic(["bigger", "biggest", "larger", "largest", "closer", "closest"], lambda env: env.bigger_than()),
         RelHeuristic(["smaller", "smallest", "tinier", "tiniest", "further", "furthest"], lambda env: env.smaller_than()),
     ]

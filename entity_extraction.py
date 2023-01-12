@@ -59,7 +59,7 @@ class Entity(NamedTuple):
         if head.i not in chunks:
             # Handles predicative cases.
             # TODO: Also extract predicative relations.
-            # catches "man bottom left"
+            # catches "man bottom left", "left man"
             children = list(head.children)
             if children:
                 flag = False
@@ -92,7 +92,7 @@ class Entity(NamedTuple):
         is_keyword |= token.text in heuristics.null_keywords
 
         # Found another entity head.  
-        if token.i in chunks and chunks[token.i] is not hchunk and not is_keyword: # enter a new noun chunk (not relations)
+        if token.i in chunks and chunks[token.i] is not hchunk and not is_keyword: # enter a new noun chunk (but not hurt cases like "woman on right")
             tchunk = chunks[token.i]
             tokens.sort(key=lambda tok: tok.i)
             subhead = cls.extract(token, chunks, heuristics)
@@ -115,6 +115,8 @@ class Entity(NamedTuple):
                         sups = find_superlatives(tokens + [token], heuristics)
                         superlatives.extend(sups)
             """
+            if child.text == "with":
+                continue
             new_tokens = tokens + [token] if token.i not in chunks or is_keyword else tokens
             subrel, subsup = cls._get_rel_sups(child, head, new_tokens, chunks, heuristics)
             relations.extend(subrel)
