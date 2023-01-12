@@ -58,8 +58,7 @@ class Entity(NamedTuple):
         sup = []
         if head.i not in chunks:
             # Handles predicative cases.
-            # TODO: Also extract predicative relations.
-            # catches "man bottom left", "left man"
+            # catches cases like "man bottom left", "left man"
             children = list(head.children)
             if children:
                 flag = False
@@ -73,8 +72,8 @@ class Entity(NamedTuple):
                     return None
             else:
                 return None
-        hchunk = chunks[head.i]                                            # a man to the left of a woman
-        rels, sups = cls._get_rel_sups(head, head, [], chunks, heuristics) # man, man, [], {0,1: a man, 3,4: the left, 6,7: a woman}
+        hchunk = chunks[head.i]                                            
+        rels, sups = cls._get_rel_sups(head, head, [], chunks, heuristics)
         sups.extend(sup)
         return cls(hchunk, rels, sups)
 
@@ -107,7 +106,7 @@ class Entity(NamedTuple):
         superlatives = []
         is_keyword |= any(token.text in h.keywords for h in heuristics.superlatives)
         for child in token.children:
-            """
+            """ no need after upgrading the spaCy
             if token.i not in chunks and child.i not in chunks:
                 if not any(child.text in h.keywords for h in heuristics.superlatives):
                     if n_children == 1:
@@ -115,8 +114,10 @@ class Entity(NamedTuple):
                         sups = find_superlatives(tokens + [token], heuristics)
                         superlatives.extend(sups)
             """
-            if child.text == "with":
+            """
+            if child.text == "with":   # doesn't fix cases like "noun.1 with noun.2", actually use the IPS score of noun.1 only
                 continue
+            """
             new_tokens = tokens + [token] if token.i not in chunks or is_keyword else tokens
             subrel, subsup = cls._get_rel_sups(child, head, new_tokens, chunks, heuristics)
             relations.extend(subrel)
