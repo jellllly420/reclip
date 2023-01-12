@@ -65,12 +65,11 @@ class Entity(NamedTuple):
                 flag = False
                 for child in children:
                     if child.i in chunks:
+                        sup.extend(find_superlatives([head], heuristics))
                         head = child
                         flag = True
                         break
-                if flag:
-                    sup.extend(find_superlatives([head], heuristics))
-                else:
+                if not flag:
                     return None
             else:
                 return None
