@@ -6,6 +6,7 @@ from collections import defaultdict
 from overrides import overrides
 import numpy as np
 import spacy
+import re
 from spacy.tokens.token import Token
 from spacy.tokens.span import Span
 from argparse import Namespace
@@ -58,6 +59,10 @@ class Parse(RefMethod):
         """Construct an `Entity` tree from the parse and execute it to yield a distribution over boxes."""
         # Start by using the full caption, as in Baseline.
         probs = env.filter(caption, area_threshold=self.box_area_threshold, softmax=True)
+
+        # catches cases like "right woman serving cakes"
+        caption = re.sub('[a-z]*ing', 'with', caption)
+        caption = re.sub('[A-Z]*ING', 'with', caption)
 
         # Extend the baseline using parse stuff.
         doc = self.nlp(caption)
@@ -140,7 +145,9 @@ class Parse(RefMethod):
                     rel_probs.append((ent2.text, new_probs, probs2))
                     continue
 
-                # Specifically handles "with", which connects two noun chunks like "noun.1 with noun.2"
+                # Specifically handles "with", which connects two noun chunks like "noun.1 with noun.2" ("woman on right")
+                # However, it doesn't help on cases like "woman with white cap on right" with the limit of spaCy,
+                # which are already handled during the procedure of entity extraction.
                 rel = None
                 if any(tok.text == "with" for tok in tokens):
                     text += ("with" + ent2.text)
