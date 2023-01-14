@@ -126,7 +126,11 @@ class Parse(RefMethod):
                     new_probs = L.join_reduce(events)
                     rel_probs.append((ent2.text, new_probs, probs2))
                     continue
-
+                # "with" handled
+                rel = None
+                if any(tok.text == "with" for tok in tokens):
+                    text += ("with" + ent2.text)
+                    continue
                 # This case specifically handles "between", which takes two noun arguments.
                 rel = None
                 for heuristic in self.heuristics.ternary_relations:
