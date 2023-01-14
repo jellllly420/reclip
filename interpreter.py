@@ -175,19 +175,19 @@ class Environment:
 
     @spatial()
     def left_of(b1, b2):
-        return (b1.right+b1.left) / 2 < (b2.right+b2.left) / 2
+        return ((b1.right+b1.left) < (b2.right+b2.left)) and ((b1.left < b2.left) or (b1.right < b2.right))
 
     @spatial()
     def right_of(b1, b2):
-        return (b1.right+b1.left) / 2 > (b2.right+b2.left) / 2
+        return ((b1.right+b1.left) > (b2.right+b2.left)) and ((b1.left > b2.left) or (b1.right > b2.right))
 
     @spatial()
     def above(b1, b2):
-        return (b1.bottom+b1.top) < (b2.bottom+b2.top)
+        return ((b1.bottom+b1.top) > (b2.bottom+b2.top)) and ((b1.top > b2.top) or (b1.bottom > b2.bottom))
 
     @spatial()
     def below(b1, b2):
-        return (b1.bottom+b1.top) > (b2.bottom+b2.top)
+        return ((b1.bottom+b1.top) < (b2.bottom+b2.top)) and ((b1.top < b2.top) or (b1.bottom < b2.bottom))
 
     @spatial()
     def bigger_than(b1, b2):
