@@ -176,19 +176,19 @@ class Environment:
 
     @spatial()
     def left_of(b1, b2):
-        return 0.7 * ((b1.right+b1.left) < (b2.right+b2.left)) + 0.3 * ((b1.left < b2.left) or (b1.right < b2.right))
+        return 0.5 * ((b1.right+b1.left) < (b2.right+b2.left)) + 0.5 * ((b1.left < b2.left) or (b1.right < b2.right))
 
     @spatial()
     def right_of(b1, b2):
-        return 0.7 * ((b1.right+b1.left) > (b2.right+b2.left)) + 0.3 * ((b1.left > b2.left) or (b1.right > b2.right))
+        return 0.5 * ((b1.right+b1.left) > (b2.right+b2.left)) + 0.5 * ((b1.left > b2.left) or (b1.right > b2.right))
 
     @spatial()
     def above(b1, b2):
-        return 0.7 * ((b1.bottom+b1.top) > (b2.bottom+b2.top)) + 0.3 * ((b1.top > b2.top) or (b1.bottom > b2.bottom))
+        return 0.5 * ((b1.bottom+b1.top) > (b2.bottom+b2.top)) + 0.5 * ((b1.top > b2.top) or (b1.bottom > b2.bottom))
 
     @spatial()
     def below(b1, b2):
-        return 0.7 * ((b1.bottom+b1.top) < (b2.bottom+b2.top)) + 0.3 * ((b1.top < b2.top) or (b1.bottom < b2.bottom))
+        return 0.5 * ((b1.bottom+b1.top) < (b2.bottom+b2.top)) + 0.5 * ((b1.top < b2.top) or (b1.bottom < b2.bottom))
 
     @spatial()
     def bigger_than(b1, b2):
