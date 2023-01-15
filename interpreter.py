@@ -125,12 +125,13 @@ class spatial:
 
 
 class Environment:
-    def __init__(self, image: Image, boxes: List[Box], executor: "Executor" = None, freeform_boxes: bool = False, image_name: str = None):
+    def __init__(self, image: Image, boxes: List[Box], executor: "Executor" = None, interpreter_parameter: float = 1., freeform_boxes: bool = False, image_name: str = None):
         self.image = image
         self.boxes = boxes
         self.executor = executor  # An object or callback that can query CLIP with captions/images.
         self.freeform_boxes = freeform_boxes
         self.image_name = image_name
+        self.interpreter_parameter = interpreter_parameter
 
     def uniform(self) -> np.ndarray:
         n_boxes = len(self.boxes)
@@ -175,19 +176,19 @@ class Environment:
 
     @spatial()
     def left_of(b1, b2):
-        return ((b1.right+b1.left) < (b2.right+b2.left)) and ((b1.left < b2.left) or (b1.right < b2.right))
+        return 0.9 * ((b1.right+b1.left) < (b2.right+b2.left)) + 0.1 * ((b1.left < b2.left) or (b1.right < b2.right))
 
     @spatial()
     def right_of(b1, b2):
-        return ((b1.right+b1.left) > (b2.right+b2.left)) and ((b1.left > b2.left) or (b1.right > b2.right))
+        return 0.9 * ((b1.right+b1.left) > (b2.right+b2.left)) + 0.1 * ((b1.left > b2.left) or (b1.right > b2.right))
 
     @spatial()
     def above(b1, b2):
-        return ((b1.bottom+b1.top) > (b2.bottom+b2.top)) and ((b1.top > b2.top) or (b1.bottom > b2.bottom))
+        return 0.9 * ((b1.bottom+b1.top) > (b2.bottom+b2.top)) + 0.1 * ((b1.top > b2.top) or (b1.bottom > b2.bottom))
 
     @spatial()
     def below(b1, b2):
-        return ((b1.bottom+b1.top) < (b2.bottom+b2.top)) and ((b1.top < b2.top) or (b1.bottom < b2.bottom))
+        return 0.9 * ((b1.bottom+b1.top) < (b2.bottom+b2.top)) + 0.1 * ((b1.top < b2.top) or (b1.bottom < b2.bottom))
 
     @spatial()
     def bigger_than(b1, b2):

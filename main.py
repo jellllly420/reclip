@@ -62,6 +62,7 @@ if __name__ == "__main__":
     parser.add_argument("--expand_chunks", action="store_true", help="(Parse) Expand noun chunks to include descendant tokens that aren't ancestors of tokens in other chunks")
     parser.add_argument("--parse_no_branch", action="store_true", help="(Parse) Only do the parsing procedure if some relation/superlative keyword is in the expression")
     parser.add_argument("--possessive_no_expand", action="store_true", help="(Parse) Expand ent2 in possessive case")
+    parser.add_argument("--interpreter_parameter", action="store_true",default=1, help="(Interpreter) Mixed Proportion")
     args = parser.parse_args()
 
     with open(args.input_file) as f:
@@ -137,7 +138,7 @@ if __name__ == "__main__":
                     boxes = [Box(x=0, y=0, w=img.width, h=img.height)]
             else:
                 boxes = gold_boxes
-            env = Environment(img, boxes, executor, (args.mdetr is not None and not args.mdetr_given_bboxes), str(datum["image_id"]))
+            env = Environment(img, boxes, executor, args.interpreter_parameter, (args.mdetr is not None and not args.mdetr_given_bboxes), str(datum["image_id"]))
             if args.shuffle_words:
                 words = sentence["raw"].lower().split()
                 random.shuffle(words)
