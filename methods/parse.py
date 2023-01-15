@@ -80,6 +80,17 @@ class Parse(RefMethod):
         else:
             texts = [caption]
             self.counts["n_full_expr"] += 1
+            # Catches cases like "yellowshirt on left" which don't have any noun_chunk in the dependency parse
+            sup = None
+            for heuristic_index, heuristic in enumerate(self.heuristics.superlatives):
+                if any(token in caption for token in heuristic.keywords):
+                    sup = heuristic.callback(env)
+                    self.counts[f"n_sup_{heuristic.keywords[0]}"] += 1
+                    break
+            if sup is not None:
+                precond = probs
+                probs = L.meet(np.expand_dims(precond, axis=1)*np.expand_dims(precond, axis=0), sup).sum(axis=1)
+                probs = probs / probs.sum()
 
         self.counts["n_total"] += 1
         pred = np.argmax(probs)
